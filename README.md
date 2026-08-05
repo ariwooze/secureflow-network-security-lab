@@ -102,8 +102,6 @@ show logging
 show running-config
 ```
 
-These commands are supported within the Cisco Packet Tracer devices used in this project, although the available output may be more limited than on physical Cisco equipment.
-
 ## Tools and Frameworks
 
 | Tool or framework | Use in the project |
