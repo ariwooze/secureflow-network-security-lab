@@ -115,7 +115,6 @@ These commands are supported within the Cisco Packet Tracer devices used in this
 | MXToolbox | SPF, DKIM, and DMARC configuration checks |
 | STRIDE | Threat identification and classification |
 | NIST Cybersecurity Framework 2.0 | Mapping controls to security outcomes |
-| PDPA 2010 and PCI DSS | Compliance considerations for personal and payment-related data |
 
 ## Repository Structure
 
@@ -159,8 +158,6 @@ secureflow-network-security-lab/
 6. Follow the tests documented in `docs/test-plan.md`.
 7. Compare your results with the screenshots under `evidence/`.
 
-> All credentials and shared secrets in the public lab must be sanitised and used for simulation only. Never reuse them in a real environment.
-
 ## Packet Tracer Limitations
 
 - Packet Tracer simulates only a subset of the features available on production Cisco equipment.
@@ -194,10 +191,6 @@ This project was completed as part of a three-person university assignment by Ar
 - Tested: `[add the security tests you performed]`
 - Researched and presented: `[add your report or presentation sections]`
 
-## Ethical Use
-
-This repository is provided solely for education and authorised security testing. Do not use its configurations, techniques, or lab materials to access or disrupt systems without explicit permission.
-
 ## Project Status
 
 - [x] Network topology designed
@@ -208,8 +201,3 @@ This repository is provided solely for education and authorised security testing
 - [ ] Device configurations exported and sanitised
 - [ ] Evidence screenshots organised
 - [ ] Personal contribution section finalised
-
-## Licence
-
-This project is available under the [MIT License](LICENSE). University-provided materials and third-party trademarks remain the property of their respective owners.
-
