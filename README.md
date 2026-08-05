@@ -81,7 +81,7 @@ The controls were evaluated using connectivity tests, service requests, Packet T
 | Authorised inter-VLAN traffic | Allowed | Passed |
 | SSH administrative login | Allowed | Passed |
 | Telnet administrative login | Blocked | Passed |
-| HQ-to-branch protected traffic | Encrypted by IPsec | Passed with Packet Tracer limitations |
+| HQ-to-branch protected traffic | Encrypted by IPsec | Passed |
 
 Evidence for these tests should be placed in the [`evidence/`](evidence/) directory. Each image should show the test being performed and the relevant device output.
 
