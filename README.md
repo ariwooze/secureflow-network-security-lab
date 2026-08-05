@@ -121,8 +121,6 @@ These commands are supported within the Cisco Packet Tracer devices used in this
 ```text
 secureflow-network-security-lab/
 ├── README.md
-├── LICENSE
-├── .gitignore
 ├── lab/
 │   └── secureflow-network.pkt
 ├── configs/
@@ -132,11 +130,7 @@ secureflow-network-security-lab/
 ├── diagrams/
 │   └── secureflow-topology.png
 ├── docs/
-│   ├── architecture.md
-│   ├── security-controls.md
-│   ├── test-plan.md
-│   ├── threat-assessment.md
-│   └── limitations.md
+│   ├── report.pdf
 └── evidence/
     ├── vlan-segmentation/
     ├── acl-testing/
@@ -155,8 +149,7 @@ secureflow-network-security-lab/
 3. Open `lab/secureflow-network.pkt` in Packet Tracer.
 4. Allow the simulated devices to finish booting and converging.
 5. Inspect the topology and device configurations.
-6. Follow the tests documented in `docs/test-plan.md`.
-7. Compare your results with the screenshots under `evidence/`.
+6. Test and compare your results with the screenshots under `evidence/`.
 
 ## Packet Tracer Limitations
 
@@ -190,14 +183,3 @@ This project was completed as part of a three-person university assignment by Ar
 - Configured: `[add the devices and controls you implemented]`
 - Tested: `[add the security tests you performed]`
 - Researched and presented: `[add your report or presentation sections]`
-
-## Project Status
-
-- [x] Network topology designed
-- [x] Core security controls configured
-- [x] Connectivity and access-control tests completed
-- [x] Packet Tracer limitations documented
-- [ ] Sanitised Packet Tracer file uploaded
-- [ ] Device configurations exported and sanitised
-- [ ] Evidence screenshots organised
-- [ ] Personal contribution section finalised
