@@ -1,0 +1,127 @@
+! SecureFlow Network Security Lab
+! Device: CoreSwitch
+! Role: Layer 3 inter-VLAN routing and internal segmentation
+! Environment: Cisco Packet Tracer
+! Source: Network Security Audit Report by Ariana, Angela & Irdina
+! Note: Credentials are intentionally sanitised for public GitHub use.
+! Note: The report labels Security Services as VLAN 99, but its verified
+!       routing table places 192.168.1.0/24 on Vlan1. This extract follows
+!       the verified running state while retaining VLAN 99's label.
+!
+hostname CoreSwitch
+!
+ip routing
+ip domain-name secureflow.local
+username admin privilege 15 secret <REDACTED_ADMIN_SECRET>
+ip ssh version 2
+ip ssh time-out 60
+!
+vlan 10
+ name Finance
+!
+vlan 20
+ name IT
+!
+vlan 30
+ name Staff
+!
+vlan 40
+ name Guest-Wireless
+!
+vlan 90
+ name Core-to-HQ-Router
+!
+vlan 99
+ name Security-Services
+!
+vlan 100
+ name Native
+!
+interface FastEthernet0/1
+ description Transit link to HQ Perimeter Router
+ switchport access vlan 90
+ switchport mode access
+!
+interface FastEthernet0/2
+ description Trunk to Finance Switch
+ switchport trunk native vlan 100
+ switchport mode trunk
+!
+interface FastEthernet0/3
+ description Trunk to IT Switch
+ switchport trunk native vlan 100
+ switchport mode trunk
+!
+interface FastEthernet0/4
+ description Trunk to Staff Switch
+ switchport trunk native vlan 100
+ switchport mode trunk
+!
+interface FastEthernet0/6
+ description Guest Wireless Access Point
+ switchport access vlan 40
+ switchport mode access
+!
+interface Vlan1
+ description Security Services gateway - verified running state
+ ip address 192.168.1.1 255.255.255.0
+ no shutdown
+!
+interface Vlan10
+ description Finance gateway
+ ip address 192.168.10.1 255.255.255.0
+ ip access-group FINANCE_ACL in
+ no shutdown
+!
+interface Vlan20
+ description IT gateway
+ ip address 192.168.20.1 255.255.255.0
+ no shutdown
+!
+interface Vlan30
+ description Staff gateway
+ ip address 192.168.30.1 255.255.255.0
+ ip access-group STAFF_ACL in
+ no shutdown
+!
+interface Vlan40
+ description Guest Wireless gateway
+ ip address 192.168.40.1 255.255.255.0
+ ip access-group GUEST_ONLY_INTERNET in
+ no shutdown
+!
+interface Vlan90
+ description Core-to-HQ transit gateway
+ ip address 192.168.254.2 255.255.255.252
+ no shutdown
+!
+ip access-list extended FINANCE_ACL
+ deny ip 192.168.10.0 0.0.0.255 192.168.20.0 0.0.0.255
+ deny ip 192.168.10.0 0.0.0.255 192.168.30.0 0.0.0.255
+ permit ip any any
+!
+ip access-list extended STAFF_ACL
+ deny ip 192.168.30.0 0.0.0.255 192.168.20.0 0.0.0.255
+ deny ip 192.168.30.0 0.0.0.255 192.168.10.0 0.0.0.255
+ permit ip any any
+!
+ip access-list extended GUEST_ONLY_INTERNET
+ permit udp 192.168.40.0 0.0.0.255 host 192.168.50.20 eq domain
+ permit tcp 192.168.40.0 0.0.0.255 host 192.168.50.20 eq domain
+ deny ip 192.168.40.0 0.0.0.255 192.168.1.0 0.0.0.255
+ deny ip 192.168.40.0 0.0.0.255 192.168.10.0 0.0.0.255
+ deny ip 192.168.40.0 0.0.0.255 192.168.20.0 0.0.0.255
+ deny ip 192.168.40.0 0.0.0.255 192.168.30.0 0.0.0.255
+ deny ip 192.168.40.0 0.0.0.255 192.168.50.0 0.0.0.255
+ deny ip 192.168.40.0 0.0.0.255 192.168.60.0 0.0.0.255
+ permit ip 192.168.40.0 0.0.0.255 any
+!
+ip route 192.168.60.0 255.255.255.0 192.168.254.1
+ip route 0.0.0.0 0.0.0.0 192.168.254.1
+!
+line vty 0 4
+ exec-timeout 5 0
+ login local
+ transport input ssh
+!
+end

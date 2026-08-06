@@ -1,0 +1,97 @@
+! SecureFlow Network Security Lab
+! Device: HQ-Perimeter-Router
+! Role: Perimeter filtering, NAT, DMZ gateway, routing, and HQ VPN endpoint
+! Environment: Cisco Packet Tracer
+! Source: Network Security Audit Report by Ariana, Angela & Irdina
+! Note: Credentials and the IPsec pre-shared key are intentionally sanitised.
+!
+hostname HQ-Perimeter-Router
+!
+ip domain-name secureflow.local
+username admin privilege 15 secret <REDACTED_ADMIN_SECRET>
+ip ssh version 2
+ip ssh time-out 60
+!
+interface GigabitEthernet0/0/0
+ description Outside link to ISP Router
+ ip address 198.51.100.2 255.255.255.252
+ ip nat outside
+ ip access-group PERIMETER-IN in
+ crypto map VPN-MAP
+ no shutdown
+!
+interface GigabitEthernet0/0/1
+ description Inside link to Core Switch VLAN90
+ ip address 192.168.254.1 255.255.255.252
+ ip nat inside
+ no shutdown
+!
+interface GigabitEthernet0/0/2
+ description DMZ link to DMZ Switch
+ ip address 192.168.50.1 255.255.255.0
+ ip nat inside
+ no shutdown
+!
+ip route 192.168.1.0 255.255.255.0 192.168.254.2
+ip route 192.168.10.0 255.255.255.0 192.168.254.2
+ip route 192.168.20.0 255.255.255.0 192.168.254.2
+ip route 192.168.30.0 255.255.255.0 192.168.254.2
+ip route 192.168.40.0 255.255.255.0 192.168.254.2
+ip route 192.168.60.0 255.255.255.0 198.51.100.1
+ip route 0.0.0.0 0.0.0.0 198.51.100.1
+!
+ip access-list extended PERIMETER-IN
+ permit ip 192.168.60.0 0.0.0.255 192.168.0.0 0.0.255.255
+ permit tcp any host 192.168.50.10 eq www
+ permit tcp any host 192.168.50.10 eq 443
+ permit udp any host 192.168.50.20 eq domain
+ deny icmp any 192.168.0.0 0.0.255.255
+ deny ip any 192.168.1.0 0.0.0.255
+ deny ip any 192.168.10.0 0.0.0.255
+ deny ip any 192.168.20.0 0.0.0.255
+ deny ip any 192.168.30.0 0.0.0.255
+ deny ip any 192.168.40.0 0.0.0.255
+ deny ip any 192.168.60.0 0.0.0.255
+ permit ip any any
+!
+access-list 110 permit ip 192.168.1.0 0.0.0.255 192.168.60.0 0.0.0.255
+access-list 110 permit ip 192.168.10.0 0.0.0.255 192.168.60.0 0.0.0.255
+access-list 110 permit ip 192.168.20.0 0.0.0.255 192.168.60.0 0.0.0.255
+access-list 110 permit ip 192.168.30.0 0.0.0.255 192.168.60.0 0.0.0.255
+access-list 110 permit ip 192.168.50.0 0.0.0.255 192.168.60.0 0.0.0.255
+access-list 110 permit ip 192.168.0.0 0.0.255.255 192.168.60.0 0.0.0.255
+!
+ip access-list extended NAT-INTERNAL
+ deny ip 192.168.1.0 0.0.0.255 192.168.60.0 0.0.0.255
+ deny ip 192.168.10.0 0.0.0.255 192.168.60.0 0.0.0.255
+ deny ip 192.168.20.0 0.0.0.255 192.168.60.0 0.0.0.255
+ deny ip 192.168.30.0 0.0.0.255 192.168.60.0 0.0.0.255
+ deny ip 192.168.50.0 0.0.0.255 192.168.60.0 0.0.0.255
+ permit ip 192.168.0.0 0.0.255.255 any
+!
+ip nat inside source list NAT-INTERNAL interface GigabitEthernet0/0/0 overload
+ip nat inside source static tcp 192.168.50.10 80 198.51.100.2 80
+ip nat inside source static tcp 192.168.50.10 443 198.51.100.2 443
+ip nat inside source static udp 192.168.50.20 53 198.51.100.2 53
+!
+crypto isakmp policy 10
+ encr aes 256
+ hash sha
+ authentication pre-share
+ group 5
+!
+crypto isakmp key <REDACTED_VPN_PRESHARED_KEY> address 203.0.114.2
+!
+crypto ipsec transform-set VPN-SET esp-aes 256 esp-sha-hmac
+!
+crypto map VPN-MAP 10 ipsec-isakmp
+ set peer 203.0.114.2
+ set transform-set VPN-SET
+ match address 110
+!
+line vty 0 4
+ exec-timeout 5 0
+ login local
+ transport input ssh
+!
+end

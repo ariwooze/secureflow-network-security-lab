@@ -1,0 +1,68 @@
+! SecureFlow Network Security Lab
+! Device: Branch-Router
+! Role: Branch gateway, IPsec VPN endpoint, AAA/RADIUS client, and Syslog client
+! Environment: Cisco Packet Tracer
+! Source: Network Security Audit Report by Ariana, Angela & Irdina
+! Note: Local credentials, the RADIUS key, and the IPsec key are sanitised.
+!
+hostname Branch-Router
+!
+ip domain-name secureflow.local
+username admin privilege 15 secret <REDACTED_ADMIN_SECRET>
+username backup privilege 15 secret <REDACTED_BACKUP_SECRET>
+ip ssh version 2
+ip ssh authentication-retries 5
+ip ssh time-out 60
+!
+aaa new-model
+aaa authentication login default group radius local
+aaa authorization exec default group radius local
+aaa accounting exec default start-stop group radius
+!
+! Packet Tracer report evidence used the legacy RADIUS host form.
+radius-server host 192.168.1.10 key <REDACTED_RADIUS_KEY>
+!
+interface GigabitEthernet0/0/0
+ description Outside link to ISP Router
+ ip address 203.0.114.2 255.255.255.252
+ crypto map VPN-MAP
+ no shutdown
+!
+interface GigabitEthernet0/0/1
+ description Branch LAN gateway
+ ip address 192.168.60.1 255.255.255.0
+ no shutdown
+!
+ip route 0.0.0.0 0.0.0.0 203.0.114.1
+!
+access-list 110 permit ip 192.168.60.0 0.0.0.255 192.168.1.0 0.0.0.255
+access-list 110 permit ip 192.168.60.0 0.0.0.255 192.168.10.0 0.0.0.255
+access-list 110 permit ip 192.168.60.0 0.0.0.255 192.168.20.0 0.0.0.255
+access-list 110 permit ip 192.168.60.0 0.0.0.255 192.168.30.0 0.0.0.255
+access-list 110 permit ip 192.168.60.0 0.0.0.255 192.168.50.0 0.0.0.255
+access-list 110 permit ip 192.168.60.0 0.0.0.255 192.168.0.0 0.0.255.255
+!
+crypto isakmp policy 10
+ encr aes 256
+ hash sha
+ authentication pre-share
+ group 5
+!
+crypto isakmp key <REDACTED_VPN_PRESHARED_KEY> address 198.51.100.2
+!
+crypto ipsec transform-set VPN-SET esp-aes 256 esp-sha-hmac
+!
+crypto map VPN-MAP 10 ipsec-isakmp
+ set peer 198.51.100.2
+ set transform-set VPN-SET
+ match address 110
+!
+logging 192.168.1.11
+logging trap debugging
+!
+line vty 0 4
+ exec-timeout 5 0
+ login authentication default
+ transport input ssh
+!
+end
