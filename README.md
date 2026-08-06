@@ -35,11 +35,7 @@ The simulated environment contains:
 - Centralised RADIUS and Syslog services
 - An external network used to test perimeter restrictions
 
-> **Add the final topology image here:** save it as `diagrams/secureflow-topology.png`.
-
-```markdown
 ![SecureFlow network topology](diagrams/secureflow-topology.png)
-```
 
 ## Security Controls Implemented
 
